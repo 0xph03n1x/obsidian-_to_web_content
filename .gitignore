@@ -1,4 +1,5 @@
 test/
+obsidian_image_extractor
 !*.sh
 !*.c
 !README.md
