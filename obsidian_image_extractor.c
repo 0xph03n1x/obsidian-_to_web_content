@@ -89,6 +89,10 @@ int main(int argc, char *argv[]) {
       strcpy(img_list[img_num], file_line + 3);
       // printf("img_list-%s\n", &img_list[img_num]);
       img_num++;
+    } else {
+      printf("No screenshot names matches in %s with regex pattern-\"%s\"\n",
+             argv[1], IMG_REX);
+      exit(EXIT_FAILURE);
     }
   }
 
