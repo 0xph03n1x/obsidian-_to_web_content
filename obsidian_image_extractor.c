@@ -11,6 +11,7 @@
 #define IMG_MAX 1024
 
 bool is_markdown(const char *file);
+char *trailing_slash(char *path);
 int cp(const char *to, const char *from);
 
 int main(int argc, char *argv[]) {
@@ -53,15 +54,24 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  printf("Sudmitted arguments:\nObsidian markdown file to be parsed-%s\n",
+  printf("Sudmitted arguments:\n[1] Obsidian markdown file to be parsed-%s\n",
          argv[1]);
-  printf("Obsidian image directory-%s\n", argv[2]);
-  printf("Destination directory-%s\n", argv[3]);
-  printf("Desired file name-%s\n\n", argv[4]);
+  printf("[2] Obsidian image directory-%s\n", argv[2]);
+  printf("[3] Destination directory-%s\n", argv[3]);
+  printf("[4] Desired file name-%s\n\n", argv[4]);
 
   if (!(is_markdown(argv[1]))) {
     printf("No markdown file extension detected.\n");
     exit(EXIT_FAILURE);
+  }
+
+  if (argv[2][strlen(argv[2]) - 1] != '/') {
+    argv[2] = trailing_slash(argv[2]);
+  }
+
+  if (argv[3][strlen(argv[3]) - 1] != '/') {
+    printf("argv[3]-%s\n", argv[3]);
+    argv[3] = trailing_slash(argv[3]);
   }
 
   if ((fp = fopen(argv[1], "r")) == NULL) {
@@ -98,9 +108,10 @@ int main(int argc, char *argv[]) {
     strcat(src_file_path[n], img_list[n]);
     strcpy(dest_file_path[n], argv[3]);
     strcat(dest_file_path[n], argv[4]);
-    snprintf(dest_file_path[n] + strlen(dest_file_path[n]), IMG_MAX, "%d",
+    snprintf(dest_file_path[n] + strlen(dest_file_path[n]), 1000, "_%d.png",
              n + 1);
-    strcat(dest_file_path[n], ".png");
+    // snprintf(&(dest_file_path[n][strlen(dest_file_path[n])]), "_%d.png", n +
+    // 1);
     printf("Attempting to copy %s to %s\n", src_file_path[n],
            dest_file_path[n]);
     if ((cp(dest_file_path[n], src_file_path[n])) != 0) {
@@ -108,6 +119,11 @@ int main(int argc, char *argv[]) {
     } else {
       printf("Success!\n");
     }
+  }
+
+  for (int m = 0; m < img_num; m++) {
+    printf("Replace %s with %s in source markdown file.\n", img_list[m],
+           dest_file_path[m]);
   }
 
   if ((fclose(fp)) != false) {
@@ -185,4 +201,10 @@ out_error:
 
   errno = saved_errno;
   return -1;
+}
+
+char *trailing_slash(char *path) {
+  printf("Adding trailing slash to-%s\n", path);
+  strcat(path, "/");
+  return path;
 }
